@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Management - Healthcare Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-hospital-user"></i>
+                    <span class="logo-text">HealthCare System</span>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="patients.html" class="nav-link">Patients</a>
+                    <a href="doctors.html" class="nav-link">Doctors</a>
+                    <a href="appointments.html" class="nav-link active">Appointments</a>
+                </nav>
+                <div class="user-profile">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="page-header-content">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Appointment Management</h1>
+                        <p class="page-subtitle">Schedule and manage patient appointments</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" onclick="testAppointmentForm()" title="Test form functionality">
+                            <i class="fas fa-vial"></i>
+                            Test Form
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshAppointmentDropdowns()" title="Refresh patient and doctor lists">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Dropdowns
+                        </button>
+                        <button class="btn btn-primary" id="scheduleAppointmentBtn" onclick="openAppointmentModal()">
+                            <i class="fas fa-plus"></i>
+                            Schedule Appointment
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="todayAppointments">0</h3>
+                            <p class="stat-label">Today's Appointments</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="weekAppointments">0</h3>
+                            <p class="stat-label">This Week</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="pendingAppointments">0</h3>
+                            <p class="stat-label">Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="completedAppointments">0</h3>
+                            <p class="stat-label">Completed</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar View -->
+            <section class="calendar-section">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h2 class="calendar-title">Calendar View</h2>
+                        <div class="calendar-controls">
+                            <button class="calendar-btn" onclick="previousMonth()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 class="calendar-month" id="currentMonthYear"></h3>
+                            <button class="calendar-btn" onclick="nextMonth()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button class="btn btn-secondary" onclick="goToToday()">Today</button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+                        <div id="calendarDays" class="calendar-days">
+                            <!-- Calendar days will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments List -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2 class="table-title">Appointments</h2>
+                        <div class="table-actions">
+                            <div class="filter-tabs">
+                                <button class="filter-tab active" onclick="filterAppointments('all')" data-filter="all">All</button>
+                                <button class="filter-tab" onclick="filterAppointments('today')" data-filter="today">Today</button>
+                                <button class="filter-tab" onclick="filterAppointments('upcoming')" data-filter="upcoming">Upcoming</button>
+                                <button class="filter-tab" onclick="filterAppointments('past')" data-filter="past">Past</button>
+                            </div>
+                            <button class="btn btn-secondary" onclick="exportAppointments()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" id="appointmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Appointment ID</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTableBody">
+                                <!-- Appointments will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Appointment Modal -->
+    <div class="modal" id="appointmentModal" style="display: none;">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="appointmentModalTitle">Schedule New Appointment</h2>
+                <button class="modal-close" onclick="closeAppointmentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="appointment-form" id="appointmentForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientId" class="form-label">Patient</label>
+                        <select id="patientId" name="patientId" class="form-input" required>
+                            <option value="">Select Patient</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorId" class="form-label">Doctor</label>
+                        <select id="doctorId" name="doctorId" class="form-input" required>
+                            <option value="">Select Doctor</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appointmentId" class="form-label">Appointment ID</label>
+                        <input type="text" id="appointmentId" name="appointmentId" class="form-input" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appointmentDate" class="form-label">Date</label>
+                        <input type="date" id="appointmentDate" name="appointmentDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentTime" class="form-label">Time</label>
+                        <input type="time" id="appointmentTime" name="appointmentTime" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appointmentType" class="form-label">Appointment Type</label>
+                        <select id="appointmentType" name="appointmentType" class="form-input" required>
+                            <option value="">Select Type</option>
+                            <option value="consultation">Consultation</option>
+                            <option value="follow-up">Follow-up</option>
+                            <option value="check-up">Check-up</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="surgery">Surgery</option>
+                            <option value="therapy">Therapy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration" class="form-label">Duration (minutes)</label>
+                        <select id="duration" name="duration" class="form-input" required>
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                            <option value="90">90 minutes</option>
+                            <option value="120">120 minutes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select id="priority" name="priority" class="form-input" required>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select id="status" name="status" class="form-input" required>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="no-show">No Show</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reason" class="form-label">Reason for Visit</label>
+                    <textarea id="reason" name="reason" rows="3" class="form-textarea" placeholder="Brief description of the appointment reason..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes" class="form-label">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="3" class="form-textarea" placeholder="Any additional notes or special instructions..."></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAppointmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveAppointmentBtn">
+                        <i class="fas fa-save"></i>
+                        Schedule Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Appointment Modal -->
+    <div class="modal" id="viewAppointmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Appointment Details</h2>
+                <button class="modal-close" onclick="closeViewAppointmentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewAppointmentContent">
+                <!-- Appointment details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 HealthCare Management System. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Ensure appointment modal function is available
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Appointments page loaded');
+            console.log('openAppointmentModal function available:', typeof openAppointmentModal);
+            
+            // Test button click
+            const scheduleBtn = document.getElementById('scheduleAppointmentBtn');
+            if (scheduleBtn) {
+                console.log('Schedule button found:', scheduleBtn);
+                scheduleBtn.addEventListener('click', function(e) {
+                    console.log('Button clicked via event listener');
+                    e.preventDefault();
+                    openAppointmentModal();
+                });
+            } else {
+                console.log('Schedule button not found');
+            }
+            
+            // Additional form submission handling
+            const appointmentForm = document.getElementById('appointmentForm');
+            if (appointmentForm) {
+                console.log('Form found, setting up direct submit handler...');
+                
+                // Add direct submit event listener
+                appointmentForm.addEventListener('submit', function(e) {
+                    console.log('Form submitted via direct handler');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (typeof saveAppointment === 'function') {
+                        console.log('Calling saveAppointment function...');
+                        saveAppointment();
+                    } else {
+                        console.error('saveAppointment function not available');
+                        showNotification('Error: Save function not available', 'error');
+                    }
+                    
+                    return false;
+                });
+                
+                // Add submit button click handler
+                const submitBtn = document.getElementById('saveAppointmentBtn');
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', function(e) {
+                        console.log('Submit button clicked');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Validate form
+                        if (appointmentForm.checkValidity()) {
+                            console.log('Form is valid, triggering submit...');
+                            appointmentForm.dispatchEvent(new Event('submit'));
+                        } else {
+                            console.log('Form validation failed');
+                            appointmentForm.reportValidity();
+                        }
+                        
+                        return false;
+                    });
+                    console.log('Submit button handler added');
+                }
+            } else {
+                console.log('Appointment form not found');
+            }
+        });
+        
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+        
+        // Test if functions are available
+        setTimeout(function() {
+            console.log('Testing function availability:');
+            console.log('- saveAppointment:', typeof saveAppointment);
+            console.log('- openAppointmentModal:', typeof openAppointmentModal);
+            console.log('- closeAppointmentModal:', typeof closeAppointmentModal);
+            console.log('- populateAppointmentDropdowns:', typeof populateAppointmentDropdowns);
+            console.log('- refreshAppointmentDropdowns:', typeof refreshAppointmentDropdowns);
+        }, 1000);
+        
+        // Additional debugging for dropdown population
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    // Check if patient dropdown was populated
+                    const patientSelect = document.getElementById('patientId');
+                    if (patientSelect && patientSelect.children.length > 1) {
+                        console.log('Patient dropdown populated with options:', patientSelect.children.length);
+                    }
+                    
+                    // Check if doctor dropdown was populated
+                    const doctorSelect = document.getElementById('doctorId');
+                    if (doctorSelect && doctorSelect.children.length > 1) {
+                        console.log('Doctor dropdown populated with options:', doctorSelect.children.length);
+                    }
+                }
+            });
+        });
+        
+        // Start observing dropdowns after a short delay
+        setTimeout(function() {
+            const patientSelect = document.getElementById('patientId');
+            const doctorSelect = document.getElementById('doctorId');
+            
+            if (patientSelect) {
+                observer.observe(patientSelect, { childList: true });
+                console.log('Started observing patient dropdown');
+            }
+            
+            if (doctorSelect) {
+                observer.observe(doctorSelect, { childList: true });
+                console.log('Started observing doctor dropdown');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

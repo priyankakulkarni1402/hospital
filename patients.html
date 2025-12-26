@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management - Healthcare Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-hospital-user"></i>
+                    <span class="logo-text">HealthCare System</span>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="patients.html" class="nav-link active">Patients</a>
+                    <a href="doctors.html" class="nav-link">Doctors</a>
+                    <a href="appointments.html" class="nav-link">Appointments</a>
+                </nav>
+                <div class="user-profile">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="page-header-content">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Patient Management</h1>
+                        <p class="page-subtitle">Manage patient records and information</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openPatientModal()">
+                            <i class="fas fa-plus"></i>
+                            Add New Patient
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search and Filters -->
+            <section class="search-section">
+                <div class="search-controls">
+                    <div class="search-bar">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="patientSearch" class="search-input" placeholder="Search patients by name, ID, or phone...">
+                        </div>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="discharged">Discharged</option>
+                        </select>
+                        <select id="ageFilter" class="filter-select">
+                            <option value="">All Ages</option>
+                            <option value="0-18">0-18 years</option>
+                            <option value="19-35">19-35 years</option>
+                            <option value="36-50">36-50 years</option>
+                            <option value="51+">51+ years</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patient Statistics -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="totalPatients">0</h3>
+                            <p class="stat-label">Total Patients</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="activePatients">0</h3>
+                            <p class="stat-label">Active Patients</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="newThisMonth">0</h3>
+                            <p class="stat-label">New This Month</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patients Table -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2 class="table-title">Patient List</h2>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="exportPatients()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" id="patientsTable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAllPatients" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th>Patient ID</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Last Visit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientsTableBody">
+                                <!-- Patients will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="pagination-info">
+                            Showing <span id="showingFrom">0</span> to <span id="showingTo">0</span> of <span id="totalPatientsCount">0</span> patients
+                        </div>
+                        <div class="pagination">
+                            <button class="pagination-btn" onclick="previousPage()" id="prevBtn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="pagination-info">
+                                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                            </span>
+                            <button class="pagination-btn" onclick="nextPage()" id="nextBtn" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Patient Modal -->
+    <div class="modal" id="patientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
+                <button class="modal-close" onclick="closePatientModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="patient-form" id="patientForm">
+                <div class="form-tabs">
+                    <button type="button" class="tab-btn active" onclick="switchTab('personal')">Personal Info</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('medical')">Medical Info</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('emergency')">Emergency Contact</button>
+                </div>
+                
+                <!-- Personal Information Tab -->
+                <div class="tab-content" id="personalTab">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" id="firstName" name="firstName" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select id="gender" name="gender" class="form-input" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea id="address" name="address" rows="3" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patientId" class="form-label">Patient ID</label>
+                            <input type="text" id="patientId" name="patientId" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" name="status" class="form-input" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="discharged">Discharged</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medical Information Tab -->
+                <div class="tab-content" id="medicalTab" style="display: none;">
+                    <div class="form-group">
+                        <label for="bloodType" class="form-label">Blood Type</label>
+                        <select id="bloodType" name="bloodType" class="form-input">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="allergies" class="form-label">Allergies</label>
+                        <textarea id="allergies" name="allergies" rows="3" class="form-textarea" placeholder="List any known allergies"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="conditions" class="form-label">Medical Conditions</label>
+                        <textarea id="conditions" name="conditions" rows="3" class="form-textarea" placeholder="List any chronic conditions or medical history"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="medications" class="form-label">Current Medications</label>
+                        <textarea id="medications" name="medications" rows="3" class="form-textarea" placeholder="List any current medications"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Emergency Contact Tab -->
+                <div class="tab-content" id="emergencyTab" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emergencyName" class="form-label">Emergency Contact Name</label>
+                            <input type="text" id="emergencyName" name="emergencyName" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyRelationship" class="form-label">Relationship</label>
+                            <input type="text" id="emergencyRelationship" name="emergencyRelationship" class="form-input" placeholder="e.g., Spouse, Parent, Sibling">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emergencyPhone" class="form-label">Emergency Contact Phone</label>
+                            <input type="tel" id="emergencyPhone" name="emergencyPhone" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyEmail" class="form-label">Emergency Contact Email</label>
+                            <input type="email" id="emergencyEmail" name="emergencyEmail" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closePatientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="savePatientBtn">
+                        <i class="fas fa-save"></i>
+                        Save Patient
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Patient Modal -->
+    <div class="modal" id="viewPatientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Patient Details</h2>
+                <button class="modal-close" onclick="closeViewPatientModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewPatientContent">
+                <!-- Patient details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 HealthCare Management System. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Management - Healthcare Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-hospital-user"></i>
+                    <span class="logo-text">HealthCare System</span>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="patients.html" class="nav-link">Patients</a>
+                    <a href="doctors.html" class="nav-link active">Doctors</a>
+                    <a href="appointments.html" class="nav-link">Appointments</a>
+                </nav>
+                <div class="user-profile">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <div class="page-header-content">
+                    <div class="page-title-section">
+                        <h1 class="page-title">Doctor Management</h1>
+                        <p class="page-subtitle">Manage doctor profiles and specializations</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openDoctorModal()">
+                            <i class="fas fa-plus"></i>
+                            Add New Doctor
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search and Filters -->
+            <section class="search-section">
+                <div class="search-controls">
+                    <div class="search-bar">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="doctorSearch" class="search-input" placeholder="Search doctors by name, specialty, or license...">
+                        </div>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="specialtyFilter" class="filter-select">
+                            <option value="">All Specialties</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="dermatology">Dermatology</option>
+                            <option value="emergency">Emergency Medicine</option>
+                            <option value="family">Family Medicine</option>
+                            <option value="internal">Internal Medicine</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="oncology">Oncology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="psychiatry">Psychiatry</option>
+                            <option value="radiology">Radiology</option>
+                            <option value="surgery">Surgery</option>
+                        </select>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="on-leave">On Leave</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctor Statistics -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="totalDoctors">0</h3>
+                            <p class="stat-label">Total Doctors</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="activeDoctors">0</h3>
+                            <p class="stat-label">Active Doctors</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="specialtiesCount">0</h3>
+                            <p class="stat-label">Specialties</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctors Table -->
+            <section class="table-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2 class="table-title">Doctor List</h2>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="exportDoctors()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" id="doctorsTable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAllDoctors" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th>Doctor ID</th>
+                                    <th>Name</th>
+                                    <th>Specialty</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Experience</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorsTableBody">
+                                <!-- Doctors will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="pagination-info">
+                            Showing <span id="showingFrom">0</span> to <span id="showingTo">0</span> of <span id="totalDoctorsCount">0</span> doctors
+                        </div>
+                        <div class="pagination">
+                            <button class="pagination-btn" onclick="previousPage()" id="prevBtn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="pagination-info">
+                                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                            </span>
+                            <button class="pagination-btn" onclick="nextPage()" id="nextBtn" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Doctor Modal -->
+    <div class="modal" id="doctorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
+                <button class="modal-close" onclick="closeDoctorModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="doctor-form" id="doctorForm">
+                <div class="form-tabs">
+                    <button type="button" class="tab-btn active" onclick="switchTab('personal')">Personal Info</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('professional')">Professional</button>
+                    <button type="button" class="tab-btn" onclick="switchTab('schedule')">Schedule</button>
+                </div>
+                
+                <!-- Personal Information Tab -->
+                <div class="tab-content" id="personalTab">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" id="firstName" name="firstName" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select id="gender" name="gender" class="form-input" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea id="address" name="address" rows="3" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="doctorId" class="form-label">Doctor ID</label>
+                            <input type="text" id="doctorId" name="doctorId" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" name="status" class="form-input" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="on-leave">On Leave</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Professional Information Tab -->
+                <div class="tab-content" id="professionalTab" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="specialty" class="form-label">Primary Specialty</label>
+                            <select id="specialty" name="specialty" class="form-input" required>
+                                <option value="">Select Specialty</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="dermatology">Dermatology</option>
+                                <option value="emergency">Emergency Medicine</option>
+                                <option value="family">Family Medicine</option>
+                                <option value="internal">Internal Medicine</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="oncology">Oncology</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="psychiatry">Psychiatry</option>
+                                <option value="radiology">Radiology</option>
+                                <option value="surgery">Surgery</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="experience" class="form-label">Years of Experience</label>
+                            <input type="number" id="experience" name="experience" class="form-input" min="0" max="50" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="licenseNumber" class="form-label">Medical License Number</label>
+                            <input type="text" id="licenseNumber" name="licenseNumber" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="qualification" class="form-label">Primary Qualification</label>
+                            <input type="text" id="qualification" name="qualification" class="form-input" placeholder="e.g., MD, DO, MBBS" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education" class="form-label">Education & Training</label>
+                        <textarea id="education" name="education" rows="3" class="form-textarea" placeholder="Medical school, residency, fellowships..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="certifications" class="form-label">Certifications</label>
+                        <textarea id="certifications" name="certifications" rows="3" class="form-textarea" placeholder="Board certifications, special training..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="biography" class="form-label">Professional Biography</label>
+                        <textarea id="biography" name="biography" rows="4" class="form-textarea" placeholder="Brief professional biography..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Schedule Tab -->
+                <div class="tab-content" id="scheduleTab" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Available Days</label>
+                        <div class="days-selector">
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="monday">
+                                <span>Monday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="tuesday">
+                                <span>Tuesday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="wednesday">
+                                <span>Wednesday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="thursday">
+                                <span>Thursday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="friday">
+                                <span>Friday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="saturday">
+                                <span>Saturday</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="availableDays" value="sunday">
+                                <span>Sunday</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startTime" class="form-label">Start Time</label>
+                            <input type="time" id="startTime" name="startTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endTime" class="form-label">End Time</label>
+                            <input type="time" id="endTime" name="endTime" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="consultationDuration" class="form-label">Consultation Duration (minutes)</label>
+                        <select id="consultationDuration" name="consultationDuration" class="form-input">
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roomNumber" class="form-label">Office/Room Number</label>
+                        <input type="text" id="roomNumber" name="roomNumber" class="form-input" placeholder="e.g., Room 205, Office A-12">
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeDoctorModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveDoctorBtn">
+                        <i class="fas fa-save"></i>
+                        Save Doctor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Doctor Modal -->
+    <div class="modal" id="viewDoctorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Doctor Details</h2>
+                <button class="modal-close" onclick="closeViewDoctorModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewDoctorContent">
+                <!-- Doctor details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 HealthCare Management System. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
